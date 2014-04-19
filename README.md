@@ -12,6 +12,7 @@ cd carve-worker
 go get github.com/scottmotte/carve
 go get github.com/joho/godotenv
 go get github.com/iron-io/iron_go/mq
+go get github.com/rlmcpherson/s3gof3r
 cp .env.example .env
 go run worker.go
 ```
