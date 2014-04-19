@@ -66,29 +66,38 @@ func UploadAll(pngs []string) {
 	folder := u.String()
 
 	for i := range pngs {
-		Upload(pngs[i], folder, bucket)
+		uri, err := Upload(pngs[i], folder, bucket)
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println(uri)
 	}
 }
 
-func Upload(path string, folder string, bucket *s3gof3r.Bucket) {
+func Upload(path string, folder string, bucket *s3gof3r.Bucket) (string, error) {
 	r, err := os.Open(path)
 	if err != nil {
-		log.Println(err)
+		return "", err
 	}
 	defer r.Close()
 
 	header := make(http.Header)
+	header.Add("x-amz-acl", "public-read")
 	base := filepath.Base(path)
+	fullpath := folder + "/" + base
 
-	w, err := bucket.PutWriter(folder+"/"+base, header, nil)
+	w, err := bucket.PutWriter(fullpath, header, nil)
 	if err != nil {
-		log.Println(err)
+		return "", err
 	}
 	if _, err = io.Copy(w, r); err != nil {
-		log.Println(err)
+		return "", err
 	}
 	if err = w.Close(); err != nil {
-		log.Println(err)
+		return "", err
 	}
-	log.Println(path)
+
+	uri := "https://" + os.Getenv("S3_BUCKET") + ".s3.amazonaws.com/" + fullpath
+
+	return uri, nil
 }
