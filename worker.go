@@ -54,19 +54,21 @@ func Convert(url string) {
 		log.Println(err)
 	}
 
+	pngs := strings.Split(s, ",")
+	UploadAll(pngs)
+}
+
+func UploadAll(pngs []string) {
 	keys, _ := s3gof3r.EnvKeys()
 	s3 := s3gof3r.New("", keys)
 	bucket := s3.Bucket("carvedevelopment")
 	u, _ := uuid.NewV4()
 	folder := u.String()
 
-	pngs := strings.Split(s, ",")
 	for i := range pngs {
 		Upload(pngs[i], folder, bucket)
-		//go Upload(pngs[i], folder, bucket) // this should work, but make sure it is ok for large amounts of stuff
 	}
 }
-
 func Upload(path string, folder string, bucket *s3gof3r.Bucket) {
 	r, err := os.Open(path)
 	if err != nil {
