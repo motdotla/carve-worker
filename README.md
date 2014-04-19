@@ -20,6 +20,7 @@ heroku config:set AWS_ACCESS_KEY_ID=
 heroku config:set AWS_SECRET_ACCESS_KEY=
 heroku config:set S3_BUCKET=
 git push heroku master
+heroku ps:scale web=0 worker=1
 heroku open
 ```
 
