@@ -9,11 +9,7 @@ I've tried to make it as easy to use as possible, but if you have any feedback p
 ```
 git clone https://github.com/scottmotte/carve-worker.git
 cd carve-worker
-go get github.com/scottmotte/carve
-go get github.com/joho/godotenv
-go get github.com/iron-io/iron_go/mq
-go get github.com/rlmcpherson/s3gof3r
-go get github.com/nu7hatch/gouuid
+go get
 cp .env.example .env
 go run worker.go
 ```
