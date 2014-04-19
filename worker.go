@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/iron-io/iron_go/mq"
 	"github.com/joho/godotenv"
@@ -17,10 +18,10 @@ import (
 )
 
 type Document struct {
-	Pngs    []string
-	Status  string
-	Url     string
-	Webhook string
+	Pngs    []string `json:"pngs"`
+	Status  string   `json:"status"`
+	Url     string   `json:"url"`
+	Webhook string   `json:"webhook"`
 }
 
 func main() {
@@ -43,38 +44,76 @@ func main() {
 			}
 			msg.Delete()
 
-			go Convert(document.Url)
+			go Process(document)
 		}
 	}
 }
 
-func Convert(url string) {
-	s, err := carve.Convert(url, os.Getenv("CARVE_PNGS_OUTPUT_DIR"))
+func Process(document Document) {
+	s, err := carve.Convert(document.Url, os.Getenv("CARVE_PNGS_OUTPUT_DIR"))
 	if err != nil {
 		log.Println(err)
 	}
 
 	pngs := strings.Split(s, ",")
-	UploadAll(pngs)
+	png_urls, err := Upload(pngs)
+	if err != nil {
+		log.Println(err)
+	}
+
+	Webhook(png_urls, document)
 }
 
-func UploadAll(pngs []string) {
+func Webhook(png_urls []string, document Document) {
+	log.Println(png_urls)
+
+	document.Pngs = png_urls
+	document.Status = "processed"
+	payload := map[string]interface{}{"success": true, "document": document}
+
+	marshaled_payload, _ := json.Marshal(payload)
+	payload_string := string(marshaled_payload)
+
+	// Prepare the request and headers
+	log.Println(document.Webhook)
+	log.Println(document)
+	log.Println(payload_string)
+
+	req, err := http.NewRequest("POST", document.Webhook, bytes.NewBufferString(payload_string))
+	if err != nil {
+		log.Println(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// Make the request
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Println(err)
+	}
+	defer res.Body.Close()
+}
+
+func Upload(pngs []string) ([]string, error) {
 	keys, _ := s3gof3r.EnvKeys()
 	s3 := s3gof3r.New("", keys)
 	bucket := s3.Bucket(os.Getenv("S3_BUCKET"))
 	u, _ := uuid.NewV4()
 	folder := u.String()
 
+	png_urls := []string{}
+
 	for i := range pngs {
-		uri, err := Upload(pngs[i], folder, bucket)
+		uri, err := put(pngs[i], folder, bucket)
 		if err != nil {
-			log.Println(err)
+			return png_urls, err
 		}
-		log.Println(uri)
+		png_urls = append(png_urls, uri)
 	}
+
+	return png_urls, nil
 }
 
-func Upload(path string, folder string, bucket *s3gof3r.Bucket) (string, error) {
+func put(path string, folder string, bucket *s3gof3r.Bucket) (string, error) {
 	r, err := os.Open(path)
 	if err != nil {
 		return "", err
