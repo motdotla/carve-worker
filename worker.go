@@ -61,7 +61,7 @@ func Convert(url string) {
 func UploadAll(pngs []string) {
 	keys, _ := s3gof3r.EnvKeys()
 	s3 := s3gof3r.New("", keys)
-	bucket := s3.Bucket("carvedevelopment")
+	bucket := s3.Bucket(os.Getenv("S3_BUCKET"))
 	u, _ := uuid.NewV4()
 	folder := u.String()
 
@@ -69,6 +69,7 @@ func UploadAll(pngs []string) {
 		Upload(pngs[i], folder, bucket)
 	}
 }
+
 func Upload(path string, folder string, bucket *s3gof3r.Bucket) {
 	r, err := os.Open(path)
 	if err != nil {
