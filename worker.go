@@ -71,21 +71,15 @@ func Webhook(png_urls []string, document Document) {
 	document.Status = "processed"
 	payload := map[string]interface{}{"success": true, "document": document}
 
+	// there is likely a more efficient way to do this conversion to an io.Reader. any ideas?
 	marshaled_payload, _ := json.Marshal(payload)
 	payload_string := string(marshaled_payload)
-
-	// Prepare the request and headers
-	log.Println(document.Webhook)
-	log.Println(document)
-	log.Println(payload_string)
-
 	req, err := http.NewRequest("POST", document.Webhook, bytes.NewBufferString(payload_string))
 	if err != nil {
 		log.Println(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	// Make the request
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println(err)
