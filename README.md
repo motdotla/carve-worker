@@ -19,6 +19,7 @@ heroku config:set CARVE_PNGS_OUTPUT_DIR=
 heroku config:set AWS_ACCESS_KEY_ID=
 heroku config:set AWS_SECRET_ACCESS_KEY=
 heroku config:set S3_BUCKET=
+heroku config:set LOOP_MILLISECONDS=5000
 git push heroku master
 heroku ps:scale web=0 worker=1
 heroku open

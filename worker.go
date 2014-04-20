@@ -32,7 +32,9 @@ type Page struct {
 func main() {
 	godotenv.Load()
 
-	for x := range time.Tick(500 * time.Millisecond) {
+	loop_milliseconds, _ := time.ParseDuration(os.Getenv("LOOP_MILLISECONDS") + "ms")
+
+	for x := range time.Tick(loop_milliseconds) {
 		log.Println(x)
 
 		queue := mq.New(os.Getenv("QUEUE"))
