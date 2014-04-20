@@ -18,10 +18,15 @@ import (
 )
 
 type Document struct {
-	Pngs    []string `json:"pngs"`
-	Status  string   `json:"status"`
-	Url     string   `json:"url"`
-	Webhook string   `json:"webhook"`
+	Pages   []Page `json:"pages"`
+	Status  string `json:"status"`
+	Url     string `json:"url"`
+	Webhook string `json:"webhook"`
+}
+
+type Page struct {
+	Sort int    `json:"sort"`
+	Url  string `json:"url"`
 }
 
 func main() {
@@ -60,14 +65,13 @@ func Process(document Document) {
 	if err != nil {
 		log.Println(err)
 	}
+	log.Println(png_urls)
 
 	Webhook(png_urls, document)
 }
 
-func Webhook(png_urls []string, document Document) {
-	log.Println(png_urls)
-
-	document.Pngs = png_urls
+func Webhook(pages []Page, document Document) {
+	document.Pages = pages
 	document.Status = "processed"
 	payload := map[string]interface{}{"success": true, "document": document}
 
@@ -87,24 +91,29 @@ func Webhook(png_urls []string, document Document) {
 	defer res.Body.Close()
 }
 
-func Upload(pngs []string) ([]string, error) {
+func Upload(pngs []string) ([]Page, error) {
 	keys, _ := s3gof3r.EnvKeys()
 	s3 := s3gof3r.New("", keys)
 	bucket := s3.Bucket(os.Getenv("S3_BUCKET"))
 	u, _ := uuid.NewV4()
 	folder := u.String()
 
-	png_urls := []string{}
+	pages := []Page{}
 
 	for i := range pngs {
 		uri, err := put(pngs[i], folder, bucket)
 		if err != nil {
-			return png_urls, err
+			return pages, err
 		}
-		png_urls = append(png_urls, uri)
+
+		var page Page
+		page.Sort = i + 1
+		page.Url = uri
+
+		pages = append(pages, page)
 	}
 
-	return png_urls, nil
+	return pages, nil
 }
 
 func put(path string, folder string, bucket *s3gof3r.Bucket) (string, error) {
