@@ -11,7 +11,7 @@ I've tried to make it as easy to use as possible, but if you have any feedback p
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ```
-heroku ps:scale web=0 worker=1
+heroku ps:scale worker=1
 ```
 
 ## Development
