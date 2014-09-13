@@ -1,6 +1,6 @@
 # carve-worker
 
-<img src="https://raw.githubusercontent.com/motdotla/carve-api/master/carve-worker.gif" alt="carve-worker" align="right" width="320" />
+<img src="https://raw.githubusercontent.com/motdotla/carve-worker/master/carve-worker.gif" alt="carve-worker" align="right" width="320" />
 
 Background worker for converting PDFs into an array of PNGs. Works in tandem with [carve-worker](https://github.com/motdotla/carve-worker).
 
