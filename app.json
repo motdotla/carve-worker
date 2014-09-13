@@ -1,0 +1,51 @@
+{
+  "name": "carve-worker",
+  "description": "Background worker for converting PDFs into an array of PNGs",
+  "keywords": [
+    "worker",
+    "convert",
+    "PDF",
+    "PNG",
+    "carve"
+  ],
+  "website": "https://github.com/motdotla/carve-worker",
+  "repository": "https://github.com/motdotla/carve-worker",
+  "logo": "https://raw.githubusercontent.com/motdotla/carve-worker/master/carve-worker.gif",
+  "env": {
+    "BUILDPACK_URL": "https://github.com/ddollar/heroku-buildpack-multi.git",
+    "IRON_TOKEN": {
+      "description": "Get your token at http://iron.io",
+      "required": true
+    },
+    "IRON_PROJECT_ID": {
+      "description": "Get your project id at http://iron.io",
+      "required": true
+    },
+    "QUEUE": {
+      "description": "The name of the queue.",
+      "value": "carve",
+      "required": true
+    },
+    "CARVE_PNGS_OUTPUT_DIR": {
+      "description": "The temporary folder to place the processed PNGs",
+      "value": "./tmp",
+      "required": true
+    },
+    "AWS_ACCESS_KEY_ID": {
+      "description": "Your AWS access key id for saving the carved PNGs",
+      "required": true
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "description": "Your AWS secret access key for saving the carved PNGs",
+      "required": true
+    },
+    "S3_BUCKET": {
+      "description": "Your S3 bucket for saving the carved PNGs",
+      "required": true
+    },
+    "LOOP_MILLISECONDS": {
+      "value": 5000,
+      "required": true
+    }
+  }
+}
