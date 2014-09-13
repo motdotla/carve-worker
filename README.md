@@ -14,7 +14,7 @@ I've tried to make it as easy to use as possible, but if you have any feedback p
 heroku ps:scale web=0 worker=1
 ```
 
-### Development
+## Development
 ```
 git clone https://github.com/motdotla/carve-worker.git
 cd carve-worker
