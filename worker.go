@@ -17,6 +17,12 @@ import (
 	"time"
 )
 
+type Payload struct {
+	Documents []Document `json:"documents"`
+	Meta      struct {
+		Postscript string `json:"postscript"`
+	} `json:"meta"`
+}
 type Document struct {
 	Pages   []Page `json:"pages"`
 	Status  string `json:"status"`
@@ -44,20 +50,20 @@ func main() {
 		}
 		if msg != nil {
 			s := msg.Body
-			var document Document
-			err := json.Unmarshal([]byte(s), &document)
+			var payload Payload
+			err := json.Unmarshal([]byte(s), &payload)
 			if err != nil {
 				log.Println(err)
 			}
 			msg.Delete()
 
-			go Process(document)
+			go Process(payload)
 		}
 	}
 }
 
-func Process(document Document) {
-	s, err := carve.Convert(document.Url, os.Getenv("CARVE_PNGS_OUTPUT_DIR"))
+func Process(payload Payload) {
+	s, err := carve.Convert(payload.Documents[0].Url, os.Getenv("CARVE_PNGS_OUTPUT_DIR"))
 	if err != nil {
 		log.Println(err)
 	}
@@ -69,20 +75,16 @@ func Process(document Document) {
 	}
 	log.Println(png_urls)
 
-	Webhook(png_urls, document)
+	Webhook(png_urls, payload)
 }
 
-func Webhook(pages []Page, document Document) {
-	document.Pages = pages
-	document.Status = "processed"
-	documents := []interface{}{}
-	documents = append(documents, document)
-	payload := map[string]interface{}{"documents": documents}
-
-	// there is likely a more efficient way to do this conversion to an io.Reader. any ideas?
+func Webhook(pages []Page, payload Payload) {
+	payload.Documents[0].Pages = pages
+	payload.Documents[0].Status = "processed"
 	marshaled_payload, _ := json.Marshal(payload)
 	payload_string := string(marshaled_payload)
-	req, err := http.NewRequest("POST", document.Webhook, bytes.NewBufferString(payload_string))
+
+	req, err := http.NewRequest("POST", payload.Documents[0].Webhook, bytes.NewBufferString(payload_string))
 	if err != nil {
 		log.Println(err)
 	}
