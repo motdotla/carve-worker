@@ -87,14 +87,15 @@ func Webhook(pages []Page, payload Payload) {
 	req, err := http.NewRequest("POST", payload.Documents[0].Webhook, bytes.NewBufferString(payload_string))
 	if err != nil {
 		log.Println(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
+	} else {
+		req.Header.Set("Content-Type", "application/json")
 
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Println(err)
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Println(err)
+		}
+		defer res.Body.Close()
 	}
-	defer res.Body.Close()
 }
 
 func Upload(pngs []string) ([]Page, error) {
