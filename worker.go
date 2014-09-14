@@ -93,8 +93,9 @@ func Webhook(pages []Page, payload Payload) {
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
 			log.Println(err)
+		} else {
+			defer res.Body.Close()
 		}
-		defer res.Body.Close()
 	}
 }
 
