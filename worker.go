@@ -19,9 +19,9 @@ import (
 
 type Payload struct {
 	Documents []Document `json:"documents"`
-	Meta      struct {
-		Postscript string `json:"postscript"`
-	} `json:"meta"`
+	Meta      *struct {
+		Postscript string `json:"postscript,omitempty"`
+	} `json:"meta,omitempty"`
 }
 type Document struct {
 	Pages   []Page `json:"pages"`
