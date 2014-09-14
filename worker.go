@@ -75,7 +75,9 @@ func Process(document Document) {
 func Webhook(pages []Page, document Document) {
 	document.Pages = pages
 	document.Status = "processed"
-	payload := map[string]interface{}{"success": true, "document": document}
+	documents := []interface{}{}
+	documents = append(documents, document)
+	payload := map[string]interface{}{"documents": documents}
 
 	// there is likely a more efficient way to do this conversion to an io.Reader. any ideas?
 	marshaled_payload, _ := json.Marshal(payload)
