@@ -31,8 +31,8 @@ type Document struct {
 }
 
 type Page struct {
-	Sort int    `json:"sort"`
-	Url  string `json:"url"`
+	Number int    `json:"number"`
+	Url    string `json:"url"`
 }
 
 func main() {
@@ -115,7 +115,7 @@ func Upload(pngs []string) ([]Page, error) {
 		}
 
 		var page Page
-		page.Sort = i + 1
+		page.Number = i + 1
 		page.Url = uri
 
 		pages = append(pages, page)
